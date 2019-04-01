@@ -25,52 +25,6 @@ public class TestRules {
         kieContainer = KnowledgeSessionHelper.createRuleBase();
     }
 	
-    /*
-	@Test
-	public void testCuentasJudicialLimite(){
-		
-		sessionStatefull= KnowledgeSessionHelper
-				.getStatefulKnowledgeSession(kieContainer,"ksession-rules");
-		Data datos=new Data();
-        sessionStatefull.setGlobal("datos", datos);
-        Embargo embargo=new Embargo("e1",LocalDate.of(2017, 11, 24),TipoEmbargo.JUDICIAL,new BigDecimal(18000000));
-        sessionStatefull.insert(embargo);
-        ArrayList<Persona> personas=new ArrayList<>();
-        personas.add(new Persona("p1", "e1",TipoIdentificacion.NATURAL, new BigDecimal(6000000)));
-        personas.add(new Persona("p2", "e1",TipoIdentificacion.NATURAL, new BigDecimal(6000000)));
-        personas.add(new Persona("p3", "e1",TipoIdentificacion.JURIDICA, new BigDecimal(6000000)));
-        personas.stream().forEach(x->sessionStatefull.insert(x));
-        ArrayList<Cuenta> cuentas=new ArrayList<>();
-        //p1
-        cuentas.add(new Cuenta("c1","p1","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
-        						new BigDecimal(35000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c2","p1","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
-								new BigDecimal(3000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c3","p1","e1",TipoCuenta.CORRIENTE,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
-								new BigDecimal(2000000),EstadoCuenta.ACTIVA));
-        //p2
-        cuentas.add(new Cuenta("c4","p2","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
-								new BigDecimal(3000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c5","p2","e1",TipoCuenta.CDT,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
-								new BigDecimal(1000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c6","p2","e1",TipoCuenta.CDAT,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
-								new BigDecimal(1000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c7","p2","e1",TipoCuenta.ELECTRONICOS,SubtipoCuenta.PUBLICO,LocalDate.of(2016, 05, 26),
-								new BigDecimal(1000000),EstadoCuenta.ACTIVA));
-        cuentas.stream().forEach(x->sessionStatefull.insert(x));
-        //p3
-        cuentas.add(new Cuenta("c8","p3","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2014, 05, 26),
-        						new BigDecimal(37000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c9","p3","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2015, 05, 26),
-								new BigDecimal(3000000),EstadoCuenta.ACTIVA));
-        cuentas.stream().forEach(x->sessionStatefull.insert(x));
-        sessionStatefull.fireAllRules();
-        
-        imprimir(embargo, personas, cuentas);
-	}
-	*/
-	
-    /*
 	@Test
 	public void testCuentasCoactivoLimite(){
 		
@@ -111,52 +65,97 @@ public class TestRules {
         sessionStatefull.fireAllRules();
         imprimir(embargo, personas, cuentas);
 	}
-	*/
 	
-	@Test
-	public void testCuentasAlimentos(){
-		
-		sessionStatefull= KnowledgeSessionHelper
-				.getStatefulKnowledgeSession(kieContainer,"ksession-rules");
-		Data datos=new Data();
-        sessionStatefull.setGlobal("datos", datos);
-		
-        Embargo embargo=new Embargo("e1",LocalDate.of(2018, 11, 24),TipoEmbargo.FAMILIAR,new BigDecimal(12000000));
-        sessionStatefull.insert(embargo);
-        ArrayList<Persona> personas=new ArrayList<>();
-        personas.add(new Persona("p1", "e1",TipoIdentificacion.NATURAL, new BigDecimal(6000000)));
-        personas.add(new Persona("p2", "e1",TipoIdentificacion.NATURAL, new BigDecimal(6000000)));
-        personas.add(new Persona("p3", "e1",TipoIdentificacion.JURIDICA, new BigDecimal(6000000)));
-        personas.stream().forEach(x->sessionStatefull.insert(x));
-        ArrayList<Cuenta> cuentas=new ArrayList<>();
-        //p1
-        cuentas.add(new Cuenta("c1","p1","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
-        						new BigDecimal(35000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c2","p1","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
-								new BigDecimal(3000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c3","p1","e1",TipoCuenta.CORRIENTE,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
-								new BigDecimal(2000000),EstadoCuenta.ACTIVA));
-        //p2
-        cuentas.add(new Cuenta("c4","p2","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
-								new BigDecimal(3000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c5","p2","e1",TipoCuenta.CDT,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
-								new BigDecimal(1000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c6","p2","e1",TipoCuenta.CDAT,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
-								new BigDecimal(1000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c7","p2","e1",TipoCuenta.ELECTRONICOS,SubtipoCuenta.PUBLICO,LocalDate.of(2016, 05, 26),
-								new BigDecimal(1000000),EstadoCuenta.ACTIVA));
-        cuentas.stream().forEach(x->sessionStatefull.insert(x));
-        //p3
-        cuentas.add(new Cuenta("c8","p3","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2014, 05, 26),
-        						new BigDecimal(37000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c9","p3","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2015, 05, 26),
-								new BigDecimal(3000000),EstadoCuenta.ACTIVA));
-        cuentas.stream().forEach(x->sessionStatefull.insert(x));
-        sessionStatefull.fireAllRules();
-        
-        imprimir(embargo, personas, cuentas);
-        
-	}
+//	@Test
+//	public void testCuentasJudicialLimite(){
+//		
+//		sessionStatefull= KnowledgeSessionHelper
+//				.getStatefulKnowledgeSession(kieContainer,"ksession-rules");
+//		Data datos=new Data();
+//        sessionStatefull.setGlobal("datos", datos);
+//        Embargo embargo=new Embargo("e1",LocalDate.of(2017, 11, 24),TipoEmbargo.JUDICIAL,new BigDecimal(18000000));
+//        sessionStatefull.insert(embargo);
+//        ArrayList<Persona> personas=new ArrayList<>();
+//        personas.add(new Persona("p1", "e1",TipoIdentificacion.NATURAL, new BigDecimal(6000000)));
+//        personas.add(new Persona("p2", "e1",TipoIdentificacion.NATURAL, new BigDecimal(6000000)));
+//        personas.add(new Persona("p3", "e1",TipoIdentificacion.JURIDICA, new BigDecimal(6000000)));
+//        personas.stream().forEach(x->sessionStatefull.insert(x));
+//        ArrayList<Cuenta> cuentas=new ArrayList<>();
+//        //p1
+//        cuentas.add(new Cuenta("c1","p1","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
+//        						new BigDecimal(35000000),EstadoCuenta.ACTIVA));
+//        cuentas.add(new Cuenta("c2","p1","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
+//								new BigDecimal(3000000),EstadoCuenta.ACTIVA));
+//        cuentas.add(new Cuenta("c3","p1","e1",TipoCuenta.CORRIENTE,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
+//        						new BigDecimal(2000000),EstadoCuenta.ACTIVA));
+//        
+//        //p2
+//        cuentas.add(new Cuenta("c4","p2","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
+//								new BigDecimal(3000000),EstadoCuenta.ACTIVA));
+//        cuentas.add(new Cuenta("c5","p2","e1",TipoCuenta.CDT,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
+//								new BigDecimal(1000000),EstadoCuenta.ACTIVA));
+//        cuentas.add(new Cuenta("c6","p2","e1",TipoCuenta.CDAT,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
+//								new BigDecimal(1000000),EstadoCuenta.ACTIVA));
+//        cuentas.add(new Cuenta("c7","p2","e1",TipoCuenta.ELECTRONICOS,SubtipoCuenta.PUBLICO,LocalDate.of(2016, 05, 26),
+//								new BigDecimal(1000000),EstadoCuenta.ACTIVA));
+//        cuentas.stream().forEach(x->sessionStatefull.insert(x));
+//        //p3
+//        cuentas.add(new Cuenta("c8","p3","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2014, 05, 26),
+//        						new BigDecimal(37000000),EstadoCuenta.ACTIVA));
+//        cuentas.add(new Cuenta("c9","p3","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2015, 05, 26),
+//								new BigDecimal(3000000),EstadoCuenta.ACTIVA));
+//        
+//        cuentas.stream().forEach(x->sessionStatefull.insert(x));
+//        sessionStatefull.fireAllRules();
+//        imprimir(embargo, personas, cuentas);
+//	}
+//	
+	
+	
+//	@Test
+//	public void testCuentasAlimentos(){
+//		
+//		sessionStatefull= KnowledgeSessionHelper
+//				.getStatefulKnowledgeSession(kieContainer,"ksession-rules");
+//		Data datos=new Data();
+//        sessionStatefull.setGlobal("datos", datos);
+//		
+//        Embargo embargo=new Embargo("e1",LocalDate.of(2018, 11, 24),TipoEmbargo.FAMILIAR,new BigDecimal(18000000));
+//        sessionStatefull.insert(embargo);
+//        ArrayList<Persona> personas=new ArrayList<>();
+//        personas.add(new Persona("p1", "e1",TipoIdentificacion.NATURAL, new BigDecimal(6000000)));
+//        personas.add(new Persona("p2", "e1",TipoIdentificacion.NATURAL, new BigDecimal(6000000)));
+//        personas.add(new Persona("p3", "e1",TipoIdentificacion.JURIDICA, new BigDecimal(6000000)));
+//        personas.stream().forEach(x->sessionStatefull.insert(x));
+//        ArrayList<Cuenta> cuentas=new ArrayList<>();
+//        //p1
+//        cuentas.add(new Cuenta("c1","p1","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
+//        						new BigDecimal(35000000),EstadoCuenta.ACTIVA));
+//        cuentas.add(new Cuenta("c2","p1","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
+//								new BigDecimal(3000000),EstadoCuenta.ACTIVA));
+//        cuentas.add(new Cuenta("c3","p1","e1",TipoCuenta.CORRIENTE,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
+//								new BigDecimal(2000000),EstadoCuenta.ACTIVA));
+//        //p2
+//        cuentas.add(new Cuenta("c4","p2","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
+//								new BigDecimal(3000000),EstadoCuenta.ACTIVA));
+//        cuentas.add(new Cuenta("c5","p2","e1",TipoCuenta.CDT,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
+//								new BigDecimal(1000000),EstadoCuenta.ACTIVA));
+//        cuentas.add(new Cuenta("c6","p2","e1",TipoCuenta.CDAT,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
+//								new BigDecimal(1000000),EstadoCuenta.ACTIVA));
+//        cuentas.add(new Cuenta("c7","p2","e1",TipoCuenta.ELECTRONICOS,SubtipoCuenta.PUBLICO,LocalDate.of(2016, 05, 26),
+//								new BigDecimal(1000000),EstadoCuenta.ACTIVA));
+//        cuentas.stream().forEach(x->sessionStatefull.insert(x));
+//        //p3
+//        cuentas.add(new Cuenta("c8","p3","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2014, 05, 26),
+//        						new BigDecimal(37000000),EstadoCuenta.ACTIVA));
+//        cuentas.add(new Cuenta("c9","p3","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2015, 05, 26),
+//								new BigDecimal(3000000),EstadoCuenta.ACTIVA));
+//        cuentas.stream().forEach(x->sessionStatefull.insert(x));
+//        sessionStatefull.fireAllRules();
+//        
+//        imprimir(embargo, personas, cuentas);
+//        
+//	}
 	
 	
 	public void imprimir(Embargo embargo,ArrayList<Persona> personas,ArrayList<Cuenta> cuentas) {
@@ -198,10 +197,11 @@ public class TestRules {
 			    	System.out.println("-------------------------------------------------");
 				}		
 			}
-			if(persona.getMontoPorEmbargar().compareTo(new BigDecimal(0))==1) {
+			BigDecimal montoPorEmbargar=persona.getMontoAEmbargar().subtract(persona.getMontoEmbargado());
+			if(montoPorEmbargar.compareTo(new BigDecimal(0))==1) {
 				System.out.println("La(s) cuenta(s) de la Persona con identificacion: "+persona.getIdPersona() 
 									+" fueron bloqueada(s)");
-				System.out.println("Por un faltante por embargar de: "+persona.getMontoPorEmbargar());	
+				System.out.println("Por un faltante por embargar de: "+montoPorEmbargar);	
 			}
 			System.out.println("=============================================");
 		}

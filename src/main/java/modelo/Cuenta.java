@@ -34,12 +34,9 @@ public class Cuenta {
 		this.montoEmbargado = new BigDecimal(0);
 		this.saldoCuentaFecha = saldoCuentaFecha;
 		this.estado = estado;
-		this.reglas = new ArrayList<>();
+		this.reglas = new ArrayList<>();;
 	}
 
-	
-	public Cuenta() {
-	}
 
 	public String getIdCuenta() {
 		return idCuenta;

@@ -72,13 +72,13 @@ end
 
 
 //Se cubren todos los tipos de embargo para publicos
-rule "Embargo cuentas de todo tipo por dineros publicos y adelantos"
+rule "Embargo cuentas de todo tipo por dineros publicos y adelantos "
     when
 		$cuentas: ArrayList(size > 0 )
     		from collect (Cuenta(subtipo == SubtipoCuenta.PUBLICO,estado== EstadoCuenta.ACTIVA))	
     then
     	System.out.println("--------->Embargo cuentas de todo tipo por dineros publicos y adelantos<-----------");
-    	Functions.agregarLeyes($cuentas);    		  	
+		Functions.agregarLeyes($cuentas); 	
 end
 
 rule "Embargo cuentas de todo tipo para Personas Juridica"

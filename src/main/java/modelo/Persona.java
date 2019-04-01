@@ -11,7 +11,7 @@ public class Persona {
 	private TipoIdentificacion tipoId;
 	private BigDecimal montoAEmbargar;
 	private BigDecimal montoEmbargado;
-	private BigDecimal montoPorEmbargar;
+	
 	
 	
 	public Persona(String idPersona, String idEmbargo, TipoIdentificacion tipoId, BigDecimal montoAEmbargar) {
@@ -21,7 +21,7 @@ public class Persona {
 		this.tipoId = tipoId;
 		this.montoAEmbargar = montoAEmbargar;
 		this.montoEmbargado= new BigDecimal(0);
-		this.montoPorEmbargar = new BigDecimal(0);
+		
 		
 	}
 	public String getIdPersona() {
@@ -54,12 +54,7 @@ public class Persona {
 	public void setMontoEmbargado(BigDecimal montoEmbargado) {
 		this.montoEmbargado = montoEmbargado;
 	}
-	public BigDecimal getMontoPorEmbargar() {
-		return montoPorEmbargar;
-	}
-	public void setMontoPorEmbargar(BigDecimal montoPorEmbargar) {
-		this.montoPorEmbargar = montoPorEmbargar;
-	}
+	
 
 	
 	
