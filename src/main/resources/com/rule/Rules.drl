@@ -27,74 +27,71 @@ global Data datos;
 rule "Embargo cuentas de ahorros judicial limite"
     when
         //conditions
-        $embargo: Embargo(tipo == TipoEmbargo.JUDICIAL)	  
-        $personas: ArrayList(size > 0)
-       		from collect (Persona(idEmbargo==$embargo.idEmbargo,tipoId==TipoIdentificacion.NATURAL))
-        $cuentas: ArrayList(size > 0)
-       		from collect (Cuenta(idEmbargo==$embargo.IdEmbargo,tipo == TipoCuenta.AHORROS, 
-						  subtipo == SubtipoCuenta.BASICA,saldoCuentaFecha>0,estado== EstadoCuenta.ACTIVA))						  
-    	 
+        $embargo: Embargo(tipoEmbargo == TipoEmbargo.JUDICIAL,$dems:demandados)
+        $demandado: Demandado(tipoIdentificacion==TipoIdentificacion.NATURAL,$cts:cuentas) from $dems
+		$cuentas: ArrayList(size > 0)
+       		from collect (Cuenta(tipoCuenta == TipoCuenta.AHORROS,subTipoCuenta == SubtipoCuenta.BASICA,
+       						saldoCuentaFecha>0,estado== EstadoCuenta.ACTIVA) from $cts)  	 
     then
     	System.out.println("--------->Embargo cuentas de ahorros judicial limite<-----------");
-    	Functions.embargarCuentasAhorroJudicialLimite($personas,$cuentas,datos.getAmountJudicial($embargo.getFechaOficio()));
+    	Functions.embargarCuentasAhorroJudicialLimite($demandado,$cuentas,datos.getAmountJudicial($embargo.getFechaOficio()));
 end
-
 
 rule "Embargo cuentas de ahorros coactiva limite"
     when
-    	$embargo: Embargo(tipo == TipoEmbargo.COACTIVO)
-    	$personas: ArrayList(size > 0)
-       		from collect (Persona(idEmbargo==$embargo.idEmbargo,tipoId==TipoIdentificacion.NATURAL))
+    	$embargo: Embargo(tipoEmbargo == TipoEmbargo.COACTIVO,$dems:demandados)
+    	$demandado: Demandado(tipoIdentificacion==TipoIdentificacion.NATURAL,$cts:cuentas) from $dems
     	$cuentas: ArrayList(size > 0 )
-    		from collect (Cuenta(idEmbargo==$embargo.IdEmbargo,tipo == TipoCuenta.AHORROS, 
-    						subtipo == SubtipoCuenta.BASICA,estado== EstadoCuenta.ACTIVA))		 		
+    		from collect (Cuenta(tipoCuenta == TipoCuenta.AHORROS,subTipoCuenta == SubtipoCuenta.BASICA,
+    						saldoCuentaFecha>0,estado== EstadoCuenta.ACTIVA) from $cts)		 		
     then    	
     	System.out.println("--------->Embargo cuentas de ahorros coactiva limite<-----------"); 
-    	Functions.embargarCuentasAhorroCoactivoLimite($personas,$cuentas,datos.getAmountCoactivo($embargo.getFechaOficio()));
+    	Functions.embargarCuentasAhorroCoactivoLimite($demandado,$cuentas,datos.getAmountCoactivo($embargo.getFechaOficio()));
 end
 
 /*/////////////////////////////
 // INICIO CUALQUIER CUENTA  //
 /////////////////////////////*/
+
 rule "Embargo cuentas de todo tipo por alimentos"
     when
-    	$embargo: Embargo(tipo == TipoEmbargo.FAMILIAR)
-    	$personas: ArrayList(size > 0)
-       		from collect (Persona(idEmbargo==$embargo.idEmbargo))
+    	$embargo: Embargo(tipoEmbargo == TipoEmbargo.FAMILIAR,$dems:demandados)
+    	$demandado: Demandado($cts:cuentas) from $dems
        	$cuentas: ArrayList(size > 0 )
-    		from collect (Cuenta(idEmbargo==$embargo.IdEmbargo,estado== EstadoCuenta.ACTIVA, subtipo != SubtipoCuenta.PUBLICO))		
+    		from collect (Cuenta(estado==EstadoCuenta.ACTIVA,saldoCuentaFecha>0,subTipoCuenta!= SubtipoCuenta.PUBLICO) from $cts)		
     then    	
     	System.out.println("--------->Embargo cuentas de todo tipo por alimentos<-----------");
     	ArrayList reglas=new ArrayList();
     	reglas.add("Numeral 2 Artículo 594 Código General del Proceso");
-    	Functions.embargarCuentasLimite($personas,$cuentas,reglas,new BigDecimal(0));
+    	Functions.embargarCuentasLimite($demandado,$cuentas,reglas,new BigDecimal(0));
 end
 
 
 //Se cubren todos los tipos de embargo para publicos
 rule "Embargo cuentas de todo tipo por dineros publicos y adelantos "
     when
+    	$embargo: Embargo($dems:demandados)
+    	$demandado: Demandado($cts:cuentas) from $dems
 		$cuentas: ArrayList(size > 0 )
-    		from collect (Cuenta(subtipo == SubtipoCuenta.PUBLICO,estado== EstadoCuenta.ACTIVA))	
+    		from collect (Cuenta(subTipoCuenta == SubtipoCuenta.PUBLICO,estado== EstadoCuenta.ACTIVA) from $cts)	
     then
     	System.out.println("--------->Embargo cuentas de todo tipo por dineros publicos y adelantos<-----------");
-		Functions.agregarLeyes($cuentas); 	
+		Functions.agregarLeyes($cuentas); 		
 end
 
 rule "Embargo cuentas de todo tipo para Personas Juridica"
     when
         //conditions
-        $embargo: Embargo(tipo != TipoEmbargo.FAMILIAR)	  
-        $personas: ArrayList(size > 0)
-       		from collect (Persona(idEmbargo==$embargo.idEmbargo,tipoId==TipoIdentificacion.JURIDICA))
+        $embargo: Embargo(tipoEmbargo != TipoEmbargo.FAMILIAR,$dems:demandados)
+        $demandado: Demandado(tipoIdentificacion==TipoIdentificacion.JURIDICA,$cts:cuentas) from $dems
         $cuentas: ArrayList(size > 0)
-       		from collect (Cuenta(idEmbargo==$embargo.IdEmbargo,estado== EstadoCuenta.ACTIVA))						  
+       		from collect (Cuenta(saldoCuentaFecha>0,estado== EstadoCuenta.ACTIVA) from $cts )						  
     	 
     then
     	System.out.println("--------->Embargo cuentas de todo tipo; Personas Juridica<-----------");
     	ArrayList reglas=new ArrayList();
     	reglas.add("No existe ley que proteja las personas juridicas");
-		Functions.embargarCuentasLimite($personas,$cuentas,reglas,new BigDecimal(0));
+		Functions.embargarCuentasLimite($demandado,$cuentas,reglas,new BigDecimal(0));
 end
 
 /*/////////////////////////////
@@ -103,17 +100,16 @@ end
 
 rule "Embargo de cuentas corriente"
     when
-    	$embargo: Embargo(tipo != TipoEmbargo.FAMILIAR)
-    	$personas: ArrayList(size > 0)
-       		from collect (Persona(idEmbargo==$embargo.idEmbargo,tipoId==TipoIdentificacion.NATURAL))
-       	$cuentas: ArrayList(size > 0 )
-    		from collect ($cuenta: Cuenta(idEmbargo==$embargo.idEmbargo,tipo == TipoCuenta.CORRIENTE,
-    						subtipo == SubtipoCuenta.BASICA,estado== EstadoCuenta.ACTIVA))		
+    	$embargo: Embargo(tipoEmbargo != TipoEmbargo.FAMILIAR,$dems:demandados)
+    	$demandado: Demandado(tipoIdentificacion==TipoIdentificacion.NATURAL,$cts:cuentas) from $dems
+    	$cuentas: ArrayList(size > 0 )
+    		from collect (Cuenta(tipoCuenta == TipoCuenta.CORRIENTE,subTipoCuenta == SubtipoCuenta.BASICA,
+    						saldoCuentaFecha>0,estado== EstadoCuenta.ACTIVA) from $cts)		
     then
     	System.out.println("--------->Embargo de cuentas corriente<-----------");
     	ArrayList reglas=new ArrayList();
     	reglas.add("No existe ley que proteja las cuentas corrientes");
-    	Functions.embargarCuentasLimite($personas,$cuentas,reglas,new BigDecimal(0));
+    	Functions.embargarCuentasLimite($demandado,$cuentas,reglas,new BigDecimal(0));
 end
 
 /*/////////////////////////////
@@ -122,17 +118,16 @@ end
 
 rule "Embargo de cuentas CDT"
     when
-    	$embargo: Embargo(tipo != TipoEmbargo.FAMILIAR)
-    	$personas: ArrayList(size > 0)
-       		from collect (Persona(idEmbargo==$embargo.idEmbargo,tipoId==TipoIdentificacion.NATURAL))
+    	$embargo: Embargo(tipoEmbargo != TipoEmbargo.FAMILIAR,$dems:demandados)
+    	$demandado: Demandado(tipoIdentificacion==TipoIdentificacion.NATURAL,$cts:cuentas) from $dems
 		$cuentas: ArrayList(size > 0 )
-    		from collect (Cuenta(idEmbargo==$embargo.idEmbargo,tipo == TipoCuenta.CDT,
-    						subtipo == SubtipoCuenta.BASICA,estado== EstadoCuenta.ACTIVA))		
+    		from collect (Cuenta(tipoCuenta == TipoCuenta.CDT,subTipoCuenta == SubtipoCuenta.BASICA,
+    						saldoCuentaFecha>0,estado== EstadoCuenta.ACTIVA) from $cts)		
     then 
     	System.out.println("--------->Embargo de cuentas CDT<-----------");
     	ArrayList reglas=new ArrayList();   	
     	reglas.add("No existe ley que proteja los CDT");
-    	Functions.embargarCuentasLimite($personas,$cuentas,reglas,new BigDecimal(0));
+    	Functions.embargarCuentasLimite($demandado,$cuentas,reglas,new BigDecimal(0));
 end
 
 /*////////////////
@@ -141,18 +136,17 @@ end
 
 rule "Embargo de cuentas CDAT"
     when
-    	$embargo: Embargo(tipo != TipoEmbargo.FAMILIAR)
-    	$personas: ArrayList(size > 0)
-       		from collect (Persona(idEmbargo==$embargo.idEmbargo,tipoId==TipoIdentificacion.NATURAL))
+    	$embargo: Embargo(tipoEmbargo != TipoEmbargo.FAMILIAR,$dems:demandados)
+    	$demandado: Demandado(tipoIdentificacion==TipoIdentificacion.NATURAL,$cts:cuentas) from $dems
 		$cuentas: ArrayList(size > 0 )
-    		from collect (Cuenta(idEmbargo==$embargo.idEmbargo,tipo == TipoCuenta.CDAT,
-  							subtipo == SubtipoCuenta.BASICA,estado== EstadoCuenta.ACTIVA))		
+    		from collect (Cuenta(tipoCuenta == TipoCuenta.CDAT,subTipoCuenta == SubtipoCuenta.BASICA,
+    						saldoCuentaFecha>0,estado== EstadoCuenta.ACTIVA) from $cts)		
     then
    		System.out.println("--------->Embargo de cuentas CDAT<-----------");
     	ArrayList reglas=new ArrayList(); 
     	reglas.add("Circular 64 de 2018");    	
     	reglas.add("Inembargabilidad Concepto No. 2001042689-1. Octubre 16 de 2001");
-    	Functions.embargarCuentasLimite($personas,$cuentas,reglas,datos.getAmountJudicial($embargo.getFechaOficio()));
+    	Functions.embargarCuentasLimite($demandado,$cuentas,reglas,datos.getAmountJudicial($embargo.getFechaOficio()));
 end
 
 
@@ -163,15 +157,15 @@ end
 //Se cubren todos los tipos de embargo para depositos
 rule "Embargo de depositos electronicos"
     when
-    	$embargo: Embargo(tipo != TipoEmbargo.FAMILIAR)
-    	$personas: ArrayList(size > 0)
-       		from collect (Persona(idEmbargo==$embargo.idEmbargo,tipoId==TipoIdentificacion.NATURAL))
+    	$embargo: Embargo(tipoEmbargo != TipoEmbargo.FAMILIAR,$dems:demandados)
+    	$demandado: Demandado(tipoIdentificacion==TipoIdentificacion.NATURAL,$cts:cuentas) from $dems
 		$cuentas: ArrayList(size > 0 )
-    		from collect (Cuenta(idEmbargo==$embargo.idEmbargo,tipo == TipoCuenta.ELECTRONICOS,
-  							subtipo == SubtipoCuenta.BASICA,estado== EstadoCuenta.ACTIVA))		
+    		from collect (Cuenta(tipoCuenta == TipoCuenta.ELECTRONICOS,subTipoCuenta == SubtipoCuenta.BASICA,
+    						saldoCuentaFecha>0,estado== EstadoCuenta.ACTIVA) from $cts)		
     then
    		System.out.println("--------->Embargo de cuentas depositos electronicos<-----------");
     	ArrayList reglas=new ArrayList(); 
     	reglas.add("Circular 64 de 2018");
-    	Functions.embargarCuentasLimite($personas,$cuentas,reglas,datos.getAmountJudicial($embargo.getFechaOficio()));
+    	Functions.embargarCuentasLimite($demandado,$cuentas,reglas,datos.getAmountJudicial($embargo.getFechaOficio()));
 end
+

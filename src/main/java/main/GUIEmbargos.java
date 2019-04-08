@@ -28,23 +28,33 @@ import enumeraciones.EstadoCuenta;
 import enumeraciones.TipoEmbargo;
 import enumeraciones.TipoIdentificacion;
 import modelo.Cuenta;
+import modelo.Demandado;
+import modelo.Demandante;
 import modelo.Embargo;
 import modelo.Persona;
+import simulacion.Pasarela;
+import simulacion.SimulacionCasos;
+import simulacion.SimulacionPasarelas;
+import util.SessionHelper;
 
 import javax.swing.JButton;
 import javax.swing.JTextPane;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.awt.event.ActionEvent;
 
 public class GUIEmbargos extends JFrame {
 
-	private Pasarela pasarela;
+	private SessionHelper session;
+	private Embargo embargo;
 	private JPanel contentPane;
 	private JTextField textField;
 	private JTextField textField_1;
@@ -96,34 +106,17 @@ public class GUIEmbargos extends JFrame {
 	 * Create the frame.
 	 */
 	public GUIEmbargos() {
-
+		////
+		session=new SessionHelper();
+		SimulacionPasarelas simulacionPasarela=new SimulacionPasarelas();
+		////
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 652, 683);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
-
-		pasarela = new Pasarela();
-
-		KieServices kServices = KieServices.Factory.get();
-		KieFileSystem kfs = kServices.newKieFileSystem();
-		KieRepository kr = kServices.getRepository();
-		File file;
-		try {
-			file = new File(getClass().getResource("/com/rule/Rules.drl").toURI());
-			Resource resource = kServices.getResources().newFileSystemResource(file).setResourceType(ResourceType.DRL);
-			kfs.write(resource);
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		KieBuilder kb = kServices.newKieBuilder(kfs);
-		kb.buildAll();
-		KieContainer kContainer = kServices.newKieContainer(kr.getDefaultReleaseId());
-		KieSession sessionStatefull = kContainer.newKieSession();
-		Data datos = new Data();
-		sessionStatefull.setGlobal("datos", datos);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		contentPane.add(tabbedPane);
@@ -227,8 +220,9 @@ public class GUIEmbargos extends JFrame {
 		pnlCrear.add(scrollPane_3);
 
 		tblDemandantes = new JTable();
-		tblDemandantes.setModel(new DefaultTableModel(new Object[][] { { null, null, null, null }, },
-				new String[] { "Nombres", "Apellidos", "Tipo identificacion", "Identificacion" }));
+		DefaultTableModel demandantesModel=new DefaultTableModel(null,
+				new String[] { "Nombres", "Apellidos", "Tipo identificacion", "Identificacion" });
+		tblDemandantes.setModel(demandantesModel);
 		scrollPane_3.setViewportView(tblDemandantes);
 
 		JScrollPane scrollPane_4 = new JScrollPane();
@@ -236,32 +230,44 @@ public class GUIEmbargos extends JFrame {
 		pnlCrear.add(scrollPane_4);
 
 		tblDemandados = new JTable();
-		tblDemandados.setModel(new DefaultTableModel(new Object[][] { { null, null, null, null, null }, },
-				new String[] { "Nombres", "Apellidos", "Tipo identificacion", "Identificacion", "Monto Embargo" }));
+		DefaultTableModel demandadosModel=new DefaultTableModel(null,
+				new String[] { "Nombres", "Apellidos", "Tipo identificacion", "Identificacion", "Monto Embargo" });
+		tblDemandados.setModel(demandadosModel);
 		scrollPane_4.setViewportView(tblDemandados);
 
 		JButton button = new JButton("Cargar embargo");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				txtIdEmbargo.setText("embargo1");
-				txtIdAutoridad.setText("autoridad1");
-				txtNumProceso.setText("10111213");
-				txtNumOficio.setText("1009");
-				txtFechaOficio.setText("01/01/2019");
-				txtTipoEmbargo.setText("Judicial");
-				txtMontoEmbargo.setText("12000000");
-				txtNumCuentaAgrario.setText("123214512");
-				txtCiudadCuentaAgrario.setText("Popayan");
-				txtDepartamentoCuentaAgrario.setText("Cauca");
-				tblDemandantes.getModel().setValueAt("Juan", 0, 0);
-				tblDemandantes.getModel().setValueAt("Perez", 0, 1);
-				tblDemandantes.getModel().setValueAt("Cedula", 0, 2);
-				tblDemandantes.getModel().setValueAt("100919821", 0, 3);
-				tblDemandados.getModel().setValueAt("Andres", 0, 0);
-				tblDemandados.getModel().setValueAt("Ruiz", 0, 1);
-				tblDemandados.getModel().setValueAt("Cedula", 0, 2);
-				tblDemandados.getModel().setValueAt("12332111", 0, 3);
-				tblDemandados.getModel().setValueAt("12000000", 0, 4);
+				embargo=SimulacionCasos.generarEmbargoNormal();
+				txtIdEmbargo.setText(embargo.getIdEmbargo());
+				txtIdAutoridad.setText(embargo.getIdAutoridad());
+				txtNumProceso.setText(embargo.getNumProceso());
+				txtNumOficio.setText(embargo.getNumOficio());
+				txtFechaOficio.setText(embargo.getFechaOficio().toString());
+				txtTipoEmbargo.setText(embargo.getTipoEmbargo().toString());
+				txtMontoEmbargo.setText(embargo.getMontoAEmbargar().toString());
+				txtNumCuentaAgrario.setText(embargo.getNumCuentaAgrario());
+				txtCiudadCuentaAgrario.setText(embargo.getCiudadCuentaAgrario());
+				txtDepartamentoCuentaAgrario.setText(embargo.getDepartamentoCuentaAgrario());
+				ArrayList<Demandante> demandantes=embargo.getDemandantes();
+				
+				DefaultTableModel demandantesModel=new DefaultTableModel(null,
+						new String[] { "Nombres", "Apellidos", "Tipo identificacion", "Identificacion" });
+				tblDemandantes.setModel(demandantesModel);
+				for (int i = 0; i < demandantes.size(); i++) {
+					Demandante tmp=demandantes.get(i);
+					demandantesModel.addRow(new String[] {tmp.getNombres(),tmp.getApellidos(),tmp.getTipoIdentificacion().toString(),tmp.getIdentificacion()});
+				}
+				
+				DefaultTableModel demandadosModel=new DefaultTableModel(null,
+						new String[] { "Nombres", "Apellidos", "Tipo identificacion", "Identificacion", "Monto Embargo" });
+				tblDemandados.setModel(demandadosModel);
+				ArrayList<Demandado> demandados=embargo.getDemandados();
+				for (int i = 0; i < demandados.size(); i++) {
+					Demandado tmp=demandados.get(i);
+					tblDemandados.setModel(demandadosModel);
+					demandadosModel.addRow(new String[] {tmp.getNombres(),tmp.getApellidos(),tmp.getTipoIdentificacion().toString(),tmp.getIdentificacion(),tmp.getMontoAEmbargar().toString()});
+				}			
 			}
 		});
 		button.setBounds(113, 572, 143, 23);
@@ -270,48 +276,14 @@ public class GUIEmbargos extends JFrame {
 		JButton button_1 = new JButton("Aplicar embargo");
 		button_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				LocalDate localDate = LocalDate.parse(txtFechaOficio.getText(), formatter);
-				TipoEmbargo tipoEmbargo = null;
-				switch (txtTipoEmbargo.getText()) {
-				case "Judicial":
-					tipoEmbargo = TipoEmbargo.JUDICIAL;
-					break;
-				case "Coactivo":
-					tipoEmbargo = TipoEmbargo.COACTIVO;
-					break;
-				case "Familiar":
-					tipoEmbargo = TipoEmbargo.FAMILIAR;
-					break;
-				case "Cooperativa":
-					tipoEmbargo = TipoEmbargo.COOPERATIVA;
-					break;
-				}
-				Embargo embargo = new Embargo(txtIdEmbargo.getText(), localDate, tipoEmbargo,
-						new BigDecimal(txtMontoEmbargo.getText()));
-				ArrayList<Persona> personas = new ArrayList<>();
-				ArrayList<Cuenta> cuentas= new ArrayList<>();
-				for (int i = 0; i < tblDemandados.getModel().getRowCount(); i++) {
-					TipoIdentificacion tipoIdentificacion = null;
-					switch (tblDemandados.getModel().getValueAt(i, 2).toString()) {
-					case "Cedula":
-						tipoIdentificacion = TipoIdentificacion.NATURAL;
-						break;
-					case "NIT":
-						tipoIdentificacion = TipoIdentificacion.JURIDICA;
-						break;
-					}
-					personas.add(new Persona(tblDemandados.getModel().getValueAt(i, 3).toString(),
-							txtIdEmbargo.getText(), tipoIdentificacion,
-							new BigDecimal(tblDemandados.getModel().getValueAt(i, 4).toString())));
-					cuentas.addAll(pasarela.consulta(tblDemandados.getModel().getValueAt(i, 3).toString(),
-							txtIdEmbargo.getText()));					
-				}
-				cuentas.stream().forEach(x -> sessionStatefull.insert(x));
+				KieSession sessionStatefull= session.obtenerSesion();				
+			    String mensajePasarela=simulacionPasarela.llamarPasarelas(embargo.getDemandados());
 				sessionStatefull.insert(embargo);
-				personas.stream().forEach(x -> sessionStatefull.insert(x));
 				sessionStatefull.fireAllRules();
-				imprimir(embargo, personas, cuentas);
+				session.cerrarSesion(sessionStatefull);
+				GUIResultado gui=new GUIResultado(mensajePasarela,imprimir(embargo),GUIEmbargos.this);
+				gui.setVisible(true);
+				
 			}
 		});
 		button_1.setBounds(321, 572, 129, 23);
@@ -475,55 +447,75 @@ public class GUIEmbargos extends JFrame {
 		textField_17.setBounds(368, 143, 186, 20);
 		pnlConsultas.add(textField_17);
 	}
+	
+	
 
-	public void imprimir(Embargo embargo, ArrayList<Persona> personas, ArrayList<Cuenta> cuentas) {
+	public Embargo getEmbargo() {
+		return embargo;
+	}
 
-		System.out.println("Embargo de tipo: " + embargo.getTipo() + " por un valor: " + embargo.getMontoAEmbargar());
+	public void setEmbargo(Embargo embargo) {
+		this.embargo = embargo;
+	}
+
+	public String imprimir(Embargo embargo) {
+		// Create a stream to hold the output
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		PrintStream ps = new PrintStream(baos);
+		PrintStream old = System.out;
+		System.setOut(ps);
+		System.out.println(
+				"Embargo de tipo: " + embargo.getTipoEmbargo() + " del: " + embargo.getFechaOficio()
+				+ " por un valor: " + embargo.getMontoAEmbargar());
 		System.out.println("=============================================");
-		for (Persona persona : personas) {
-			System.out.println("Persona: " + persona.getTipoId() + " con identificacion: " + persona.getIdPersona());
-			System.out.println("Con un monto a Embargar de: " + persona.getMontoAEmbargar());
+		for (Demandado demandado : embargo.getDemandados()) {
+			System.out.println("Persona: " + demandado.getTipoIdentificacion() + " con identificacion: "
+					+ demandado.getIdentificacion());
+			System.out.println("Con un monto a Embargar de: " + demandado.getMontoAEmbargar());
 			System.out.println("La(s) siguiente(s) cuenta(s)  ");
 			System.out.println("-------------------------------------------------");
-			if (persona.getMontoAEmbargar().compareTo(persona.getMontoEmbargado()) == 1) {
-				cuentas.stream().filter(c -> c.getIdPersona().equalsIgnoreCase(persona.getIdPersona()))
-						.forEach(c -> c.setEstado(EstadoCuenta.BLOQUEADA));
+
+			if (demandado.getMontoAEmbargar().compareTo(demandado.getMontoEmbargado()) == 1) {
+				demandado.getCuentas().stream().forEach(c -> c.setEstado(EstadoCuenta.BLOQUEADA));
 			}
-			for (Cuenta cuenta : cuentas) {
-				if (cuenta.getIdPersona().equals(persona.getIdPersona())) {
-					if (persona.getMontoEmbargado().compareTo(new BigDecimal(0)) > 0) {
-						System.out.println("La cuenta:" + cuenta.getIdCuenta() + " de:" + cuenta.getTipo() + " de "
-								+ cuenta.getSubtipo());
-						System.out.println("Fecha de creacion: " + cuenta.getFechaCreacion());
-						System.out.println("Embargada por un monto de: " + cuenta.getMontoEmbargado());
-						System.out.println("Con saldo a la fecha de:" + cuenta.getSaldoCuentaFecha());
-						System.out.println(" Estado de la cuenta: " + cuenta.getEstado());
-						System.out.println("  en base a las siguientes leyes:");
-					} else {
-						System.out.println("La cuenta:" + cuenta.getIdCuenta() + " de:" + cuenta.getTipo() + " de "
-								+ cuenta.getSubtipo());
-						System.out.println("Con saldo a la fecha de:" + cuenta.getSaldoCuentaFecha());
-						System.out.println("No se puede embargar");
-						System.out.println("Estado de la cuenta: " + cuenta.getEstado());
-						if (cuenta.getSaldoCuentaFecha().compareTo(new BigDecimal(0)) == 0) {
-							System.out.println("Saldo insuficiente");
-						}
-						System.out.println("  en base a las siguientes leyes:");
+
+			for (Cuenta cuenta : demandado.getCuentas()) {
+				if (demandado.getMontoEmbargado().compareTo(new BigDecimal(0)) > 0) {
+					System.out.println("La cuenta:" + cuenta.getIdCuenta() + " de:" + cuenta.getTipoCuenta() + " de "
+							+ cuenta.getSubTipoCuenta());
+					System.out.println("Fecha de creacion: " + cuenta.getFechaCreacion());
+					System.out.println("Embargada por un monto de: " + cuenta.getMontoEmbargado());
+					System.out.println("Con saldo a la fecha de:" + cuenta.getSaldoCuentaFecha());
+					System.out.println(" Estado de la cuenta: " + cuenta.getEstado());
+					System.out.println("  en base a las siguientes leyes:");
+				} else {
+					System.out.println("La cuenta:" + cuenta.getIdCuenta() + " de:" + cuenta.getTipoCuenta() + " de "
+							+ cuenta.getSubTipoCuenta());
+					System.out.println("Con saldo a la fecha de:" + cuenta.getSaldoCuentaFecha());
+					System.out.println("No se puede embargar");
+					System.out.println("Estado de la cuenta: " + cuenta.getEstado());
+					if (cuenta.getSaldoCuentaFecha().compareTo(new BigDecimal(0)) == 0) {
+						System.out.println("Saldo insuficiente");
 					}
-					for (String regla : cuenta.getReglas()) {
-						System.out.println("\t" + regla);
-					}
-					System.out.println("-------------------------------------------------");
+					System.out.println("  en base a las siguientes leyes:");
 				}
+				for (String regla : cuenta.getReglas()) {
+					System.out.println("\t" + regla);
+				}
+				System.out.println("-------------------------------------------------");
+
 			}
-			BigDecimal montoPorEmbargar = persona.getMontoAEmbargar().subtract(persona.getMontoEmbargado());
+			BigDecimal montoPorEmbargar = demandado.getMontoAEmbargar().subtract(demandado.getMontoEmbargado());
 			if (montoPorEmbargar.compareTo(new BigDecimal(0)) == 1) {
-				System.out.println("La(s) cuenta(s) de la Persona con identificacion: " + persona.getIdPersona()
+				System.out.println("La(s) cuenta(s) de la Persona con identificacion: " + demandado.getIdentificacion()
 						+ " fueron bloqueada(s)");
 				System.out.println("Por un faltante por embargar de: " + montoPorEmbargar);
 			}
 			System.out.println("=============================================");
 		}
+		System.out.flush();
+		System.setOut(old);
+		return baos.toString();
 	}
 
 }

@@ -1,67 +1,53 @@
 package modelo;
 
-import java.math.BigDecimal;
-
 import enumeraciones.TipoIdentificacion;
 
 public class Persona {
-	
-	private String idPersona;
-	private String idEmbargo;
-	private TipoIdentificacion tipoId;
-	private BigDecimal montoAEmbargar;
-	private BigDecimal montoEmbargado;
-	
-	
-	
-	public Persona(String idPersona, String idEmbargo, TipoIdentificacion tipoId, BigDecimal montoAEmbargar) {
-		super();
-		this.idPersona = idPersona;
-		this.idEmbargo = idEmbargo;
-		this.tipoId = tipoId;
-		this.montoAEmbargar = montoAEmbargar;
-		this.montoEmbargado= new BigDecimal(0);
-		
-		
-	}
-	public String getIdPersona() {
-		return idPersona;
-	}
-	public void setIdPersona(String idPersona) {
-		this.idPersona = idPersona;
-	}
-	public String getIdEmbargo() {
-		return idEmbargo;
-	}
-	public void setIdEmbargo(String idEmbargo) {
-		this.idEmbargo = idEmbargo;
-	}
-	public TipoIdentificacion getTipoId() {
-		return tipoId;
-	}
-	public void setTipoId(TipoIdentificacion tipoId) {
-		this.tipoId = tipoId;
-	}
-	public BigDecimal getMontoAEmbargar() {
-		return montoAEmbargar;
-	}
-	public void setMontoAEmbargar(BigDecimal montoAEmbargar) {
-		this.montoAEmbargar = montoAEmbargar;
-	}
-	public BigDecimal getMontoEmbargado() {
-		return montoEmbargado;
-	}
-	public void setMontoEmbargado(BigDecimal montoEmbargado) {
-		this.montoEmbargado = montoEmbargado;
-	}
-	
 
-	
-	
-	
-	
-	
-	
-	
-	
+	private String identificacion;
+	private String nombres;
+	private String apellidos;
+	private TipoIdentificacion tipoIdentificacion;
+
+	public Persona(String identificacion, String nombres, String apellidos,
+			TipoIdentificacion tipoIdentificacion) {
+		super();
+		this.identificacion = identificacion;
+		this.nombres = nombres;
+		this.apellidos = apellidos;
+		this.tipoIdentificacion = tipoIdentificacion;
+	}
+
+	public String getIdentificacion() {
+		return identificacion;
+	}
+
+	public void setIdentificacion(String idPersona) {
+		this.identificacion = idPersona;
+	}
+
+	public TipoIdentificacion getTipoIdentificacion() {
+		return tipoIdentificacion;
+	}
+
+	public void setTipoIdentificacion(TipoIdentificacion tipoId) {
+		this.tipoIdentificacion = tipoId;
+	}
+
+	public String getNombres() {
+		return nombres;
+	}
+
+	public void setNombres(String nombres) {
+		this.nombres = nombres;
+	}
+
+	public String getApellidos() {
+		return apellidos;
+	}
+
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
+	}
+
 }

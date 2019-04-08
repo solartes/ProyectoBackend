@@ -28,14 +28,17 @@ import enumeraciones.TipoCuenta;
 import enumeraciones.TipoEmbargo;
 import enumeraciones.TipoIdentificacion;
 import modelo.Cuenta;
+import modelo.Demandado;
 import modelo.Embargo;
 import modelo.Persona;
+import util.KnowledgeSessionHelper;
 
 public class DroolsTest {
 
 	public static void main(String[] args) throws DroolsParserException, IOException {
-		DroolsTest droolsTest = new DroolsTest();
-		droolsTest.executeDrools();
+		
+//		DroolsTest droolsTest = new DroolsTest();
+//		droolsTest.executeDrools();
 	}
 
 	public void executeDrools() throws DroolsParserException, IOException {
@@ -57,87 +60,101 @@ public class DroolsTest {
 		kb.buildAll();
 		KieContainer kContainer = kServices.newKieContainer(kr.getDefaultReleaseId());
 		KieSession sessionStatefull = kContainer.newKieSession();
+		// Cuentas Demandado1
+		ArrayList<Cuenta> cuentasD1 = new ArrayList<>();
+		cuentasD1.add(new Cuenta("idCuenta1", "idBanco1", TipoCuenta.AHORROS, SubtipoCuenta.BASICA,
+				LocalDate.of(2016, 05, 26), new BigDecimal(35000000), EstadoCuenta.ACTIVA));
+		cuentasD1.add(new Cuenta("idCuenta2", "idBanco1", TipoCuenta.AHORROS, SubtipoCuenta.BASICA,
+				LocalDate.of(2016, 05, 26), new BigDecimal(3000000), EstadoCuenta.ACTIVA));
+		cuentasD1.add(new Cuenta("idCuenta3", "idBanco1", TipoCuenta.CORRIENTE, SubtipoCuenta.BASICA,
+				LocalDate.of(2016, 05, 26), new BigDecimal(2000000), EstadoCuenta.ACTIVA));
 
+		// Cuentas Demandado2
+		ArrayList<Cuenta> cuentasD2 = new ArrayList<>();
+		cuentasD2.add(new Cuenta("idCuenta4", "idBanco1", TipoCuenta.AHORROS, SubtipoCuenta.BASICA,
+				LocalDate.of(2016, 05, 26), new BigDecimal(3000000), EstadoCuenta.ACTIVA));
+		cuentasD2.add(new Cuenta("idCuenta5", "idBanco1", TipoCuenta.CDT, SubtipoCuenta.BASICA,
+				LocalDate.of(2016, 05, 26), new BigDecimal(1000000), EstadoCuenta.ACTIVA));
+		cuentasD2.add(new Cuenta("idCuenta6", "idBanco1", TipoCuenta.CDAT, SubtipoCuenta.BASICA,
+				LocalDate.of(2016, 05, 26), new BigDecimal(1000000), EstadoCuenta.ACTIVA));
+		cuentasD2.add(new Cuenta("idCuenta7", "idBanco1", TipoCuenta.ELECTRONICOS, SubtipoCuenta.PUBLICO,
+				LocalDate.of(2016, 05, 26), new BigDecimal(1000000), EstadoCuenta.ACTIVA));
+
+		// Cuentas Demandado3
+		ArrayList<Cuenta> cuentasD3 = new ArrayList<>();
+		cuentasD3.add(new Cuenta("idCuenta8", "idBanco1", TipoCuenta.AHORROS, SubtipoCuenta.BASICA,
+				LocalDate.of(2014, 05, 26), new BigDecimal(37000000), EstadoCuenta.ACTIVA));
+		cuentasD3.add(new Cuenta("idCuenta9", "idBanco1", TipoCuenta.AHORROS, SubtipoCuenta.BASICA,
+				LocalDate.of(2015, 05, 26), new BigDecimal(3000000), EstadoCuenta.ACTIVA));
+
+		ArrayList<Demandado> demandados = new ArrayList<>();
+
+		demandados.add(
+				new Demandado("idDemandado1", "", "", TipoIdentificacion.NATURAL, new BigDecimal(6000000), cuentasD1));
+		demandados.add(
+				new Demandado("idDemandado2", "", "", TipoIdentificacion.NATURAL, new BigDecimal(6000000), cuentasD2));
+		demandados.add(
+				new Demandado("idDemandado3", "", "", TipoIdentificacion.JURIDICA, new BigDecimal(6000000), cuentasD3));
+
+		Embargo embargo = new Embargo("e1", "", "", "", LocalDate.of(2017, 11, 24), TipoEmbargo.JUDICIAL,
+				new BigDecimal(18000000), "", "", "", null, demandados);
+
+		
 		Data datos = new Data();
-        sessionStatefull.setGlobal("datos", datos);
-        Embargo embargo=new Embargo("e1",LocalDate.of(2018, 11, 24),TipoEmbargo.COACTIVO,new BigDecimal(18000000));
-        sessionStatefull.insert(embargo);
-        ArrayList<Persona> personas=new ArrayList<>();
-        personas.add(new Persona("p1", "e1",TipoIdentificacion.NATURAL, new BigDecimal(6000000)));
-        personas.add(new Persona("p2", "e1",TipoIdentificacion.NATURAL, new BigDecimal(6000000)));
-        personas.add(new Persona("p3", "e1",TipoIdentificacion.JURIDICA, new BigDecimal(6000000)));
-        personas.stream().forEach(x->sessionStatefull.insert(x));
-        ArrayList<Cuenta> cuentas=new ArrayList<>();
-        //p1
-        cuentas.add(new Cuenta("c1","p1","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2014, 05, 26),
-        						new BigDecimal(17000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c2","p1","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2015, 05, 26),
-								new BigDecimal(3000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c3","p1","e1",TipoCuenta.CORRIENTE,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
-								new BigDecimal(2000000),EstadoCuenta.ACTIVA));
-        //p2
-        cuentas.add(new Cuenta("c4","p2","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
-								new BigDecimal(3000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c5","p2","e1",TipoCuenta.CDT,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
-								new BigDecimal(1000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c6","p2","e1",TipoCuenta.CDAT,SubtipoCuenta.BASICA,LocalDate.of(2016, 05, 26),
-								new BigDecimal(1000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c7","p2","e1",TipoCuenta.ELECTRONICOS,SubtipoCuenta.PUBLICO,LocalDate.of(2016, 05, 26),
-								new BigDecimal(1000000),EstadoCuenta.ACTIVA)); 
-        //p3
-        cuentas.add(new Cuenta("c8","p3","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2014, 05, 26),
-        						new BigDecimal(37000000),EstadoCuenta.ACTIVA));
-        cuentas.add(new Cuenta("c9","p3","e1",TipoCuenta.AHORROS,SubtipoCuenta.BASICA,LocalDate.of(2015, 05, 26),
-								new BigDecimal(3000000),EstadoCuenta.ACTIVA));
-        cuentas.stream().forEach(x->sessionStatefull.insert(x));
-        sessionStatefull.fireAllRules();
-        imprimir(embargo, personas, cuentas);
+		sessionStatefull.setGlobal("datos", datos);
+		sessionStatefull.insert(embargo);
+		sessionStatefull.fireAllRules();
+		imprimir(embargo);
 	}
 
-	public void imprimir(Embargo embargo,ArrayList<Persona> personas,ArrayList<Cuenta> cuentas) {
-		
-		
-		System.out.println("Embargo de tipo: "+ embargo.getTipo()+" por un valor: "+ embargo.getMontoAEmbargar());
+	public void imprimir(Embargo embargo) {
+
+		System.out.println(
+				"Embargo de tipo: " + embargo.getTipoEmbargo() + " del: " + embargo.getFechaOficio()
+				+ " por un valor: " + embargo.getMontoAEmbargar());
 		System.out.println("=============================================");
-		for(Persona persona:personas) {
-			System.out.println("Persona: "+ persona.getTipoId()+ " con identificacion: "+persona.getIdPersona());
-			System.out.println("Con un monto a Embargar de: "+persona.getMontoAEmbargar());
+		for (Demandado demandado : embargo.getDemandados()) {
+			System.out.println("Persona: " + demandado.getTipoIdentificacion() + " con identificacion: "
+					+ demandado.getIdentificacion());
+			System.out.println("Con un monto a Embargar de: " + demandado.getMontoAEmbargar());
 			System.out.println("La(s) siguiente(s) cuenta(s)  ");
 			System.out.println("-------------------------------------------------");
-			if(persona.getMontoAEmbargar().compareTo(persona.getMontoEmbargado())==1) {
-				cuentas.stream().filter(c -> c.getIdPersona().equalsIgnoreCase(persona.getIdPersona())).
-				forEach(c->c.setEstado(EstadoCuenta.BLOQUEADA));		
+
+			if (demandado.getMontoAEmbargar().compareTo(demandado.getMontoEmbargado()) == 1) {
+				demandado.getCuentas().stream().forEach(c -> c.setEstado(EstadoCuenta.BLOQUEADA));
 			}
-			for(Cuenta cuenta:cuentas) {
-				if(cuenta.getIdPersona().equals(persona.getIdPersona())) {
-					if(persona.getMontoEmbargado().compareTo(new BigDecimal(0))>0) {					
-						System.out.println("La cuenta:"+cuenta.getIdCuenta() +" de:"+ cuenta.getTipo()
-											+" de "+ cuenta.getSubtipo() );
-						System.out.println("Fecha de creacion: "+cuenta.getFechaCreacion());
-						System.out.println("Embargada por un monto de: "+cuenta.getMontoEmbargado());
-						System.out.println("Con saldo a la fecha de:"+cuenta.getSaldoCuentaFecha());
-						System.out.println(" Estado de la cuenta: "+cuenta.getEstado());
-						System.out.println("  en base a las siguientes leyes:");		
-					}else {
-						System.out.println("La cuenta:"+cuenta.getIdCuenta() +" de:"+ cuenta.getTipo()
-						+" de "+ cuenta.getSubtipo() );
-						System.out.println("Con saldo a la fecha de:"+cuenta.getSaldoCuentaFecha());
-						System.out.println("No se puede embargar");
-						System.out.println("Estado de la cuenta: "+cuenta.getEstado());
-						if(cuenta.getSaldoCuentaFecha().compareTo(new BigDecimal(0))==0){System.out.println("Saldo insuficiente");}
-						System.out.println("  en base a las siguientes leyes:");
+
+			for (Cuenta cuenta : demandado.getCuentas()) {
+				if (demandado.getMontoEmbargado().compareTo(new BigDecimal(0)) > 0) {
+					System.out.println("La cuenta:" + cuenta.getIdCuenta() + " de:" + cuenta.getTipoCuenta() + " de "
+							+ cuenta.getSubTipoCuenta());
+					System.out.println("Fecha de creacion: " + cuenta.getFechaCreacion());
+					System.out.println("Embargada por un monto de: " + cuenta.getMontoEmbargado());
+					System.out.println("Con saldo a la fecha de:" + cuenta.getSaldoCuentaFecha());
+					System.out.println(" Estado de la cuenta: " + cuenta.getEstado());
+					System.out.println("  en base a las siguientes leyes:");
+				} else {
+					System.out.println("La cuenta:" + cuenta.getIdCuenta() + " de:" + cuenta.getTipoCuenta() + " de "
+							+ cuenta.getSubTipoCuenta());
+					System.out.println("Con saldo a la fecha de:" + cuenta.getSaldoCuentaFecha());
+					System.out.println("No se puede embargar");
+					System.out.println("Estado de la cuenta: " + cuenta.getEstado());
+					if (cuenta.getSaldoCuentaFecha().compareTo(new BigDecimal(0)) == 0) {
+						System.out.println("Saldo insuficiente");
 					}
-					for(String regla:cuenta.getReglas()) {
-			    		System.out.println("\t"+regla);
-			    	}
-			    	System.out.println("-------------------------------------------------");
-				}		
+					System.out.println("  en base a las siguientes leyes:");
+				}
+				for (String regla : cuenta.getReglas()) {
+					System.out.println("\t" + regla);
+				}
+				System.out.println("-------------------------------------------------");
+
 			}
-			BigDecimal montoPorEmbargar=persona.getMontoAEmbargar().subtract(persona.getMontoEmbargado());
-			if(montoPorEmbargar.compareTo(new BigDecimal(0))==1) {
-				System.out.println("La(s) cuenta(s) de la Persona con identificacion: "+persona.getIdPersona() 
-									+" fueron bloqueada(s)");
-				System.out.println("Por un faltante por embargar de: "+montoPorEmbargar);	
+			BigDecimal montoPorEmbargar = demandado.getMontoAEmbargar().subtract(demandado.getMontoEmbargado());
+			if (montoPorEmbargar.compareTo(new BigDecimal(0)) == 1) {
+				System.out.println("La(s) cuenta(s) de la Persona con identificacion: " + demandado.getIdentificacion()
+						+ " fueron bloqueada(s)");
+				System.out.println("Por un faltante por embargar de: " + montoPorEmbargar);
 			}
 			System.out.println("=============================================");
 		}
