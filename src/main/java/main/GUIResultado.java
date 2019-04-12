@@ -9,6 +9,7 @@ import javax.swing.border.EmptyBorder;
 
 import controladores.EmbargosController;
 import modelo.Demandado;
+import modelo.Embargo;
 import modelo.Intento;
 
 import javax.swing.JScrollPane;
@@ -27,7 +28,7 @@ public class GUIResultado extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public GUIResultado(String mensajePasarela,String mensaje, GUIEmbargos parent) {
+	public GUIResultado(String mensajePasarela,String mensaje, Embargo embargo) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 544, 429);
 		contentPane = new JPanel();
@@ -46,13 +47,14 @@ public class GUIResultado extends JFrame {
 		JButton btnNewButton = new JButton("Aplicar medida");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				for(Demandado demandado:parent.getEmbargo().getDemandados()) {
+				for(Demandado demandado:embargo.getDemandados()) {
 					ArrayList<Intento> intentos=new ArrayList<>();
 					Intento intento=new Intento(LocalDate.now(), true,mensajePasarela, demandado.getCuentas());
 					intentos.add(intento);
 					demandado.setIntentos(intentos);	
 				}
-				EmbargosController.guardarEmbargo(parent.getEmbargo());
+				embargo.setEmbargoProcesado(true);
+				EmbargosController.guardarEmbargo(embargo);
 			}
 		});
 		btnNewButton.setBounds(112, 356, 149, 23);
@@ -61,13 +63,14 @@ public class GUIResultado extends JFrame {
 		JButton btnNewButton_1 = new JButton("No aplicar medida");
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {				
-				for(Demandado demandado:parent.getEmbargo().getDemandados()) {
+				for(Demandado demandado:embargo.getDemandados()) {
 					ArrayList<Intento> intentos=new ArrayList<>();
 					Intento intento=new Intento(LocalDate.now(), false,mensajePasarela, demandado.getCuentas());
 					intentos.add(intento);
 					demandado.setIntentos(intentos);					
 				}
-				EmbargosController.guardarEmbargo(parent.getEmbargo());
+				embargo.setEmbargoProcesado(false);
+				EmbargosController.guardarEmbargo(embargo);
 			}
 		});
 		btnNewButton_1.setBounds(327, 356, 149, 23);

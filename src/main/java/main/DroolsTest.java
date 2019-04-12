@@ -30,13 +30,14 @@ import enumeraciones.TipoIdentificacion;
 import modelo.Cuenta;
 import modelo.Demandado;
 import modelo.Embargo;
+import modelo.EmbargoJudicial;
 import modelo.Persona;
 import util.KnowledgeSessionHelper;
 
 public class DroolsTest {
 
 	public static void main(String[] args) throws DroolsParserException, IOException {
-		
+
 //		DroolsTest droolsTest = new DroolsTest();
 //		droolsTest.executeDrools();
 	}
@@ -55,7 +56,7 @@ public class DroolsTest {
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
+		}
 		KieBuilder kb = kServices.newKieBuilder(kfs);
 		kb.buildAll();
 		KieContainer kContainer = kServices.newKieContainer(kr.getDefaultReleaseId());
@@ -96,10 +97,9 @@ public class DroolsTest {
 		demandados.add(
 				new Demandado("idDemandado3", "", "", TipoIdentificacion.JURIDICA, new BigDecimal(6000000), cuentasD3));
 
-		Embargo embargo = new Embargo("e1", "", "", "", LocalDate.of(2017, 11, 24), TipoEmbargo.JUDICIAL,
-				new BigDecimal(18000000), "", "", "", null, demandados);
+		Embargo embargo = new EmbargoJudicial("e1", "", "", LocalDate.of(2017, 11, 24), TipoEmbargo.JUDICIAL, "", "",
+				"", demandados, new BigDecimal(18000000), "", null);
 
-		
 		Data datos = new Data();
 		sessionStatefull.setGlobal("datos", datos);
 		sessionStatefull.insert(embargo);
@@ -109,9 +109,7 @@ public class DroolsTest {
 
 	public void imprimir(Embargo embargo) {
 
-		System.out.println(
-				"Embargo de tipo: " + embargo.getTipoEmbargo() + " del: " + embargo.getFechaOficio()
-				+ " por un valor: " + embargo.getMontoAEmbargar());
+		System.out.println("Embargo de tipo: " + embargo.getTipoEmbargo() + " del: " + embargo.getFechaOficio());
 		System.out.println("=============================================");
 		for (Demandado demandado : embargo.getDemandados()) {
 			System.out.println("Persona: " + demandado.getTipoIdentificacion() + " con identificacion: "

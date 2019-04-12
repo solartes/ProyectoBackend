@@ -29,8 +29,11 @@ import enumeraciones.TipoEmbargo;
 import enumeraciones.TipoIdentificacion;
 import modelo.Cuenta;
 import modelo.Demandado;
+import modelo.DemandadoDian;
 import modelo.Demandante;
 import modelo.Embargo;
+import modelo.EmbargoCoactivo;
+import modelo.EmbargoJudicial;
 import modelo.Persona;
 import simulacion.Pasarela;
 import simulacion.SimulacionCasos;
@@ -54,17 +57,18 @@ import java.awt.event.ActionEvent;
 public class GUIEmbargos extends JFrame {
 
 	private SessionHelper session;
-	private Embargo embargo;
+	private EmbargoJudicial embargoJudicial;
+	private EmbargoCoactivo embargoCoactivo;
 	private JPanel contentPane;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_4;
-	private JTextField textField_5;
-	private JTextField textField_7;
-	private JTextField textField_8;
-	private JTextField textField_9;
-	private JTable table_1;
+	private JTextField txtIdEmbargoDian;
+	private JTextField txtIdAutoridadDian;
+	private JTextField txtNumProcesoDian;
+	private JTextField txtFechaOficioDian;
+	private JTextField txtTipoEmbargoDian;
+	private JTextField txtNumCuentaAgrarioDian;
+	private JTextField txtCiudadCuentaAgrarioDian;
+	private JTextField txtDepartamentoCuentaAgrarioDian;
+	private JTable tblDemandadosDian;
 	private JTextField textField_10;
 	private JTextField textField_11;
 	private JTextField textField_12;
@@ -238,18 +242,18 @@ public class GUIEmbargos extends JFrame {
 		JButton button = new JButton("Cargar embargo");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				embargo=SimulacionCasos.generarEmbargoNormal();
-				txtIdEmbargo.setText(embargo.getIdEmbargo());
-				txtIdAutoridad.setText(embargo.getIdAutoridad());
-				txtNumProceso.setText(embargo.getNumProceso());
-				txtNumOficio.setText(embargo.getNumOficio());
-				txtFechaOficio.setText(embargo.getFechaOficio().toString());
-				txtTipoEmbargo.setText(embargo.getTipoEmbargo().toString());
-				txtMontoEmbargo.setText(embargo.getMontoAEmbargar().toString());
-				txtNumCuentaAgrario.setText(embargo.getNumCuentaAgrario());
-				txtCiudadCuentaAgrario.setText(embargo.getCiudadCuentaAgrario());
-				txtDepartamentoCuentaAgrario.setText(embargo.getDepartamentoCuentaAgrario());
-				ArrayList<Demandante> demandantes=embargo.getDemandantes();
+				embargoJudicial=(EmbargoJudicial) SimulacionCasos.generarEmbargoNormal();
+				txtIdEmbargo.setText(embargoJudicial.getIdEmbargo());
+				txtIdAutoridad.setText(embargoJudicial.getIdAutoridad());
+				txtNumProceso.setText(embargoJudicial.getNumProceso());
+				txtNumOficio.setText(embargoJudicial.getNumOficio());
+				txtFechaOficio.setText(embargoJudicial.getFechaOficio().toString());
+				txtTipoEmbargo.setText(embargoJudicial.getTipoEmbargo().toString());
+				txtMontoEmbargo.setText(embargoJudicial.getMontoAEmbargar().toString());
+				txtNumCuentaAgrario.setText(embargoJudicial.getNumCuentaAgrario());
+				txtCiudadCuentaAgrario.setText(embargoJudicial.getCiudadCuentaAgrario());
+				txtDepartamentoCuentaAgrario.setText(embargoJudicial.getDepartamentoCuentaAgrario());
+				ArrayList<Demandante> demandantes=embargoJudicial.getDemandantes();
 				
 				DefaultTableModel demandantesModel=new DefaultTableModel(null,
 						new String[] { "Nombres", "Apellidos", "Tipo identificacion", "Identificacion" });
@@ -262,7 +266,7 @@ public class GUIEmbargos extends JFrame {
 				DefaultTableModel demandadosModel=new DefaultTableModel(null,
 						new String[] { "Nombres", "Apellidos", "Tipo identificacion", "Identificacion", "Monto Embargo" });
 				tblDemandados.setModel(demandadosModel);
-				ArrayList<Demandado> demandados=embargo.getDemandados();
+				ArrayList<Demandado> demandados=embargoJudicial.getDemandados();
 				for (int i = 0; i < demandados.size(); i++) {
 					Demandado tmp=demandados.get(i);
 					tblDemandados.setModel(demandadosModel);
@@ -277,11 +281,11 @@ public class GUIEmbargos extends JFrame {
 		button_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				KieSession sessionStatefull= session.obtenerSesion();				
-			    String mensajePasarela=simulacionPasarela.llamarPasarelas(embargo.getDemandados());
-				sessionStatefull.insert(embargo);
+			    String mensajePasarela=simulacionPasarela.llamarPasarelas(embargoJudicial.getDemandados());
+				sessionStatefull.insert(embargoJudicial);
 				sessionStatefull.fireAllRules();
 				session.cerrarSesion(sessionStatefull);
-				GUIResultado gui=new GUIResultado(mensajePasarela,imprimir(embargo),GUIEmbargos.this);
+				GUIResultado gui=new GUIResultado(mensajePasarela,imprimir(embargoJudicial),embargoJudicial);
 				gui.setVisible(true);
 				
 			}
@@ -325,61 +329,96 @@ public class GUIEmbargos extends JFrame {
 		lblDepartamentocuentaagrario.setBounds(261, 132, 146, 14);
 		pnlCrearDian.add(lblDepartamentocuentaagrario);
 
-		textField = new JTextField();
-		textField.setBounds(113, 18, 143, 20);
-		pnlCrearDian.add(textField);
-		textField.setColumns(10);
+		txtIdEmbargoDian = new JTextField();
+		txtIdEmbargoDian.setBounds(113, 18, 143, 20);
+		pnlCrearDian.add(txtIdEmbargoDian);
+		txtIdEmbargoDian.setColumns(10);
 
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
-		textField_1.setBounds(113, 55, 143, 20);
-		pnlCrearDian.add(textField_1);
+		txtIdAutoridadDian = new JTextField();
+		txtIdAutoridadDian.setColumns(10);
+		txtIdAutoridadDian.setBounds(113, 55, 143, 20);
+		pnlCrearDian.add(txtIdAutoridadDian);
 
-		textField_2 = new JTextField();
-		textField_2.setColumns(10);
-		textField_2.setBounds(113, 93, 143, 20);
-		pnlCrearDian.add(textField_2);
+		txtNumProcesoDian = new JTextField();
+		txtNumProcesoDian.setColumns(10);
+		txtNumProcesoDian.setBounds(113, 93, 143, 20);
+		pnlCrearDian.add(txtNumProcesoDian);
 
-		textField_4 = new JTextField();
-		textField_4.setColumns(10);
-		textField_4.setBounds(113, 129, 143, 20);
-		pnlCrearDian.add(textField_4);
+		txtFechaOficioDian = new JTextField();
+		txtFechaOficioDian.setColumns(10);
+		txtFechaOficioDian.setBounds(113, 129, 143, 20);
+		pnlCrearDian.add(txtFechaOficioDian);
 
-		textField_5 = new JTextField();
-		textField_5.setColumns(10);
-		textField_5.setBounds(417, 18, 177, 20);
-		pnlCrearDian.add(textField_5);
+		txtTipoEmbargoDian = new JTextField();
+		txtTipoEmbargoDian.setColumns(10);
+		txtTipoEmbargoDian.setBounds(417, 18, 177, 20);
+		pnlCrearDian.add(txtTipoEmbargoDian);
 
-		textField_7 = new JTextField();
-		textField_7.setColumns(10);
-		textField_7.setBounds(417, 58, 177, 20);
-		pnlCrearDian.add(textField_7);
+		txtNumCuentaAgrarioDian = new JTextField();
+		txtNumCuentaAgrarioDian.setColumns(10);
+		txtNumCuentaAgrarioDian.setBounds(417, 58, 177, 20);
+		pnlCrearDian.add(txtNumCuentaAgrarioDian);
 
-		textField_8 = new JTextField();
-		textField_8.setColumns(10);
-		textField_8.setBounds(417, 94, 177, 20);
-		pnlCrearDian.add(textField_8);
+		txtCiudadCuentaAgrarioDian = new JTextField();
+		txtCiudadCuentaAgrarioDian.setColumns(10);
+		txtCiudadCuentaAgrarioDian.setBounds(417, 94, 177, 20);
+		pnlCrearDian.add(txtCiudadCuentaAgrarioDian);
 
-		textField_9 = new JTextField();
-		textField_9.setColumns(10);
-		textField_9.setBounds(417, 133, 177, 20);
-		pnlCrearDian.add(textField_9);
+		txtDepartamentoCuentaAgrarioDian = new JTextField();
+		txtDepartamentoCuentaAgrarioDian.setColumns(10);
+		txtDepartamentoCuentaAgrarioDian.setBounds(417, 133, 177, 20);
+		pnlCrearDian.add(txtDepartamentoCuentaAgrarioDian);
 
 		JScrollPane scrollPane_1 = new JScrollPane();
 		scrollPane_1.setBounds(12, 175, 599, 189);
 		pnlCrearDian.add(scrollPane_1);
-
-		table_1 = new JTable();
-		table_1.setModel(new DefaultTableModel(new Object[][] { { null, null, null, null, null, null, null }, },
-				new String[] { "Nombres", "Apellidos", "Tipo identificacion", "Identificacion", "resEmbargo",
-						"fechaResolucion", "montoDemandado" }));
-		scrollPane_1.setViewportView(table_1);
+		
+		tblDemandadosDian = new JTable();
+		DefaultTableModel demandadosDianModel=new DefaultTableModel(null,
+				new String[] { "Nombres", "Apellidos", "Tipo identificacion", "Identificacion", "Res Embargo","Fecha Resolucion","Monto Embargo" });
+		tblDemandadosDian.setModel(demandadosDianModel);
+		scrollPane_1.setViewportView(tblDemandadosDian);
 
 		JButton btnNewButton = new JButton("Cargar embargo");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				embargoCoactivo=(EmbargoCoactivo) SimulacionCasos.generarEmbargoDian();
+				txtIdEmbargoDian.setText(embargoCoactivo.getIdEmbargo());
+				txtIdAutoridadDian.setText(embargoCoactivo.getIdAutoridad());
+				txtNumProcesoDian.setText(embargoCoactivo.getNumProceso());				
+				txtFechaOficioDian.setText(embargoCoactivo.getFechaOficio().toString());
+				txtTipoEmbargoDian.setText(embargoCoactivo.getTipoEmbargo().toString());				
+				txtNumCuentaAgrarioDian.setText(embargoCoactivo.getNumCuentaAgrario());
+				txtCiudadCuentaAgrarioDian.setText(embargoCoactivo.getCiudadCuentaAgrario());
+				txtDepartamentoCuentaAgrarioDian.setText(embargoCoactivo.getDepartamentoCuentaAgrario());
+
+				
+				DefaultTableModel demandadosDianModel=new DefaultTableModel(null,
+						new String[] { "Nombres", "Apellidos", "Tipo identificacion", "Identificacion", "Res Embargo","Fecha Resolucion","Monto Embargo" });
+				tblDemandadosDian.setModel(demandadosDianModel);
+				ArrayList<Demandado> demandados=embargoCoactivo.getDemandados();
+				for (int i = 0; i < demandados.size(); i++) {
+					DemandadoDian tmp=(DemandadoDian) demandados.get(i);
+					tblDemandadosDian.setModel(demandadosDianModel);
+					demandadosDianModel.addRow(new String[] {tmp.getNombres(),tmp.getApellidos(),tmp.getTipoIdentificacion().toString(),tmp.getIdentificacion(),tmp.getResEmbargo(),tmp.getFechaResolucion().toString(),tmp.getMontoAEmbargar().toString()});
+				}	
+			}
+		});
 		btnNewButton.setBounds(148, 572, 111, 23);
 		pnlCrearDian.add(btnNewButton);
 
 		JButton btnNewButton_1 = new JButton("Aplicar embargo");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				KieSession sessionStatefull= session.obtenerSesion();				
+			    String mensajePasarela=simulacionPasarela.llamarPasarelas(embargoCoactivo.getDemandados());
+				sessionStatefull.insert(embargoCoactivo);
+				sessionStatefull.fireAllRules();
+				session.cerrarSesion(sessionStatefull);
+				GUIResultado gui=new GUIResultado(mensajePasarela,imprimir(embargoCoactivo),embargoCoactivo);
+				gui.setVisible(true);
+			}
+		});
 		btnNewButton_1.setBounds(321, 572, 129, 23);
 		pnlCrearDian.add(btnNewButton_1);
 
@@ -448,14 +487,20 @@ public class GUIEmbargos extends JFrame {
 		pnlConsultas.add(textField_17);
 	}
 	
-	
-
-	public Embargo getEmbargo() {
-		return embargo;
+	public EmbargoJudicial getEmbargoJudicial() {
+		return embargoJudicial;
 	}
 
-	public void setEmbargo(Embargo embargo) {
-		this.embargo = embargo;
+	public void setEmbargoJudicial(EmbargoJudicial embargoJudicial) {
+		this.embargoJudicial = embargoJudicial;
+	}
+
+	public EmbargoCoactivo getEmbargoCoactivo() {
+		return embargoCoactivo;
+	}
+
+	public void setEmbargoCoactivo(EmbargoCoactivo embargoCoactivo) {
+		this.embargoCoactivo = embargoCoactivo;
 	}
 
 	public String imprimir(Embargo embargo) {
@@ -465,8 +510,7 @@ public class GUIEmbargos extends JFrame {
 		PrintStream old = System.out;
 		System.setOut(ps);
 		System.out.println(
-				"Embargo de tipo: " + embargo.getTipoEmbargo() + " del: " + embargo.getFechaOficio()
-				+ " por un valor: " + embargo.getMontoAEmbargar());
+				"Embargo de tipo: " + embargo.getTipoEmbargo() + " del: " + embargo.getFechaOficio());
 		System.out.println("=============================================");
 		for (Demandado demandado : embargo.getDemandados()) {
 			System.out.println("Persona: " + demandado.getTipoIdentificacion() + " con identificacion: "

@@ -1,6 +1,7 @@
 package modelo;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import enumeraciones.TipoIdentificacion;
@@ -14,60 +15,49 @@ public class Demandado extends Persona {
 	@Exclude
 	private ArrayList<Cuenta> cuentas;
 	
-	public Demandado(String identificacion, String nombres, String apellidos,
-			TipoIdentificacion tipoIdentificacion, BigDecimal montoAEmbargar,ArrayList<Cuenta> cuentas) {
-		super(identificacion,nombres, apellidos, tipoIdentificacion);
-		// TODO Auto-generated constructor stub
+	public Demandado(String identificacion, String nombres, String apellidos, TipoIdentificacion tipoIdentificacion,
+			BigDecimal montoAEmbargar) {
+		super(identificacion, nombres, apellidos, tipoIdentificacion);
 		this.montoAEmbargar = montoAEmbargar;
 		this.montoEmbargado = new BigDecimal(0);
-		this.cuentas= cuentas;
+		this.intentos=new ArrayList<>();
+		this.cuentas=new ArrayList<>();
 	}
-
-	public Demandado(String identificacion, String nombres, String apellidos,
-			TipoIdentificacion tipoIdentificacion, BigDecimal montoAEmbargar) {
-		super(identificacion,nombres, apellidos, tipoIdentificacion);
-		// TODO Auto-generated constructor stub
+	
+	public Demandado(String identificacion, String nombres, String apellidos, TipoIdentificacion tipoIdentificacion,
+			BigDecimal montoAEmbargar,ArrayList<Cuenta> cuentas ) {
+		super(identificacion, nombres, apellidos, tipoIdentificacion);
 		this.montoAEmbargar = montoAEmbargar;
+		this.cuentas=cuentas;
 		this.montoEmbargado = new BigDecimal(0);
-		this.cuentas= new ArrayList<Cuenta>();
+		this.intentos=new ArrayList<>();
+		this.cuentas=new ArrayList<>();
 	}
 	
-	
-
-	public ArrayList<Intento> getIntentos() {
-		return intentos;
-	}
-
-	public void setIntentos(ArrayList<Intento> intentos) {
-		this.intentos = intentos;
-	}
-
 	public BigDecimal getMontoAEmbargar() {
 		return montoAEmbargar;
 	}
-
 	public void setMontoAEmbargar(BigDecimal montoAEmbargar) {
 		this.montoAEmbargar = montoAEmbargar;
 	}
-
 	public BigDecimal getMontoEmbargado() {
 		return montoEmbargado;
 	}
-
 	public void setMontoEmbargado(BigDecimal montoEmbargado) {
 		this.montoEmbargado = montoEmbargado;
 	}
-
+	public ArrayList<Intento> getIntentos() {
+		return intentos;
+	}
+	public void setIntentos(ArrayList<Intento> intentos) {
+		this.intentos = intentos;
+	}
 	public ArrayList<Cuenta> getCuentas() {
 		return cuentas;
 	}
-
 	public void setCuentas(ArrayList<Cuenta> cuentas) {
 		this.cuentas = cuentas;
 	}
-
-	
-	
 	
 
 }

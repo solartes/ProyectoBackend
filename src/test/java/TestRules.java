@@ -63,8 +63,9 @@ public class TestRules {
 		demandados.add(
 				new Demandado("idDemandado3", "", "", TipoIdentificacion.JURIDICA, new BigDecimal(6000000), cuentasD3));
 
-		Embargo embargo = new Embargo("e1", "", "", "", LocalDate.of(2017, 11, 24), TipoEmbargo.JUDICIAL,
-				new BigDecimal(18000000), "", "", "", null, demandados);
+		Embargo embargo=null;
+//		Embargo embargo = new EmbargoJudicial("e1", "", "", "", LocalDate.of(2017, 11, 24), TipoEmbargo.JUDICIAL,
+//				new BigDecimal(18000000), "", "", "", null, demandados);
 
 		//
 		sessionStatefull = KnowledgeSessionHelper.getStatefulKnowledgeSession(kieContainer, "ksession-rules");
@@ -114,8 +115,9 @@ public class TestRules {
 		demandados.add(
 				new Demandado("idDemandado3", "", "", TipoIdentificacion.JURIDICA, new BigDecimal(6000000), cuentasD3));
 
-		Embargo embargo = new Embargo("e1", "", "", "", LocalDate.of(2018, 11, 24), TipoEmbargo.COACTIVO,
-				new BigDecimal(18000000), "", "", "", null, demandados);
+		Embargo embargo=null;
+//		Embargo embargo = new EmbargoJudicial("e1", "", "", "", LocalDate.of(2018, 11, 24), TipoEmbargo.COACTIVO,
+//				new BigDecimal(18000000), "", "", "", null, demandados);
 
 		//
 		sessionStatefull = KnowledgeSessionHelper.getStatefulKnowledgeSession(kieContainer, "ksession-rules");
@@ -165,8 +167,9 @@ public class TestRules {
 		demandados.add(
 				new Demandado("idDemandado3", "", "", TipoIdentificacion.JURIDICA, new BigDecimal(6000000), cuentasD3));
 
-		Embargo embargo = new Embargo("e1", "", "", "", LocalDate.of(2018, 11, 24), TipoEmbargo.FAMILIAR,
-				new BigDecimal(18000000), "", "", "", null, demandados);
+		Embargo embargo=null;
+//		Embargo embargo = new EmbargoJudicial("e1", "", "", "", LocalDate.of(2018, 11, 24), TipoEmbargo.FAMILIAR,
+//				new BigDecimal(18000000), "", "", "", null, demandados);
 
 		//
 		sessionStatefull = KnowledgeSessionHelper.getStatefulKnowledgeSession(kieContainer, "ksession-rules");
@@ -180,8 +183,7 @@ public class TestRules {
 	public void imprimir(Embargo embargo) {
 
 		System.out.println(
-				"Embargo de tipo: " + embargo.getTipoEmbargo() + " del: " + embargo.getFechaOficio()
-				+ " por un valor: " + embargo.getMontoAEmbargar());
+				"Embargo de tipo: " + embargo.getTipoEmbargo() + " del: " + embargo.getFechaOficio());
 		System.out.println("=============================================");
 		for (Demandado demandado : embargo.getDemandados()) {
 			System.out.println("Persona: " + demandado.getTipoIdentificacion() + " con identificacion: "
