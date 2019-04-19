@@ -17,7 +17,7 @@ public class Pasarela {
 	}
 
 	public ArrayList<Cuenta> consultaCuentas() {
-		int randomNum = ThreadLocalRandom.current().nextInt(0, 5 + 1);
+		int randomNum = ThreadLocalRandom.current().nextInt(0, 2 + 1);
 		ArrayList<Cuenta> cuentas = new ArrayList<>();
 		for (int i = 0; i < randomNum; i++) {
 			long minDay = LocalDate.of(1970, 1, 1).toEpochDay();
