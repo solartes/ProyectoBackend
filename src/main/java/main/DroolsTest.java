@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -37,7 +38,13 @@ import util.KnowledgeSessionHelper;
 public class DroolsTest {
 
 	public static void main(String[] args) throws DroolsParserException, IOException {
+        String dirName = "../network_resources";
 
+        Files.list(new File(dirName).toPath())
+                .limit(10)
+                .forEach(path -> {
+                    System.out.println(path);
+                });
 //		DroolsTest droolsTest = new DroolsTest();
 //		droolsTest.executeDrools();
 	}

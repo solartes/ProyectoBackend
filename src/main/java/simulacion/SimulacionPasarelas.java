@@ -40,7 +40,7 @@ public class SimulacionPasarelas {
 	public String llamarPasarelas(ArrayList<Demandado> demandados) {
 		String mensaje="Se obtuvieron informacion de los siguientes bancos:";
 	    ArrayList<Pasarela> listaClonada = new ArrayList<Pasarela>(pasarelas);
-	    int numeroPasarelas = ThreadLocalRandom.current().nextInt(0, 20 + 1);
+	    int numeroPasarelas = ThreadLocalRandom.current().nextInt(0, 5 + 1);
 	    for (int i = 0; i < numeroPasarelas; i++) {
 	        int pasarelaRandom = ThreadLocalRandom.current().nextInt(0, listaClonada.size());
 	        Pasarela pasarela = listaClonada.get(pasarelaRandom);
