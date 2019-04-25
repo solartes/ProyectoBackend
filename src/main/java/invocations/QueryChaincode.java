@@ -72,9 +72,9 @@ public class QueryChaincode {
 			Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, "Querying for a car - " + args1[0]);
 			
 			Collection<ProposalResponse>  responses1Query = channelClient.queryByChainCode("embargos", "consultarEmbargo", args1);
-			for (ProposalResponse pres : responses1Query) {
+			for (ProposalResponse pres : responses1Query) {				
 				String stringResponse = new String(pres.getChaincodeActionResponsePayload());
-				Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, stringResponse);
+				Logger.getLogger(QueryChaincode.class.getName()).log(Level.INFO, "STRING"+stringResponse);
 			}		
 			
 		} catch (Exception e) {

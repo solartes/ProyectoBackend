@@ -23,10 +23,17 @@ import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import controladores.EmbargosController;
 import datos.Data;
 import enumeraciones.EstadoCuenta;
 import enumeraciones.TipoEmbargo;
 import enumeraciones.TipoIdentificacion;
+import modelo.Autoridad;
 import modelo.Cuenta;
 import modelo.Demandado;
 import modelo.DemandadoDian;
@@ -53,9 +60,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.awt.event.ActionEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 public class GUIEmbargos extends JFrame {
 
+	private Gson gson;
+	private String idAutoridad;
 	private SessionHelper session;
 	private EmbargoJudicial embargoJudicial;
 	private EmbargoCoactivo embargoCoactivo;
@@ -69,14 +80,14 @@ public class GUIEmbargos extends JFrame {
 	private JTextField txtCiudadCuentaAgrarioDian;
 	private JTextField txtDepartamentoCuentaAgrarioDian;
 	private JTable tblDemandadosDian;
-	private JTextField textField_10;
-	private JTextField textField_11;
-	private JTextField textField_12;
-	private JTextField textField_13;
-	private JTextField textField_14;
-	private JTextField textField_15;
-	private JTextField textField_16;
-	private JTextField textField_17;
+	private JTextField txtValueA;
+	private JTextField txtValueB;
+	private JTextField txtValueC;
+	private JTextField txtSelectorA;
+	private JTextField txtSelectorB;
+	private JTextField txtSelectorC;
+	private JTextField txtId;
+	private JTextField txtTipoId;
 	private JTextField txtIdEmbargo;
 	private JTextField txtIdAutoridad;
 	private JTextField txtNumProceso;
@@ -91,26 +102,12 @@ public class GUIEmbargos extends JFrame {
 	private JTable tblDemandados;
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					GUIEmbargos frame = new GUIEmbargos();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
 	 * Create the frame.
 	 */
-	public GUIEmbargos() {
+	public GUIEmbargos(String idAutoridad) {
 		////
+		gson=new Gson();
+		this.idAutoridad=idAutoridad;
 		session=new SessionHelper();
 		SimulacionPasarelas simulacionPasarela=new SimulacionPasarelas();
 		////
@@ -123,6 +120,7 @@ public class GUIEmbargos extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		
 		contentPane.add(tabbedPane);
 
 		JPanel pnlCrear = new JPanel();
@@ -243,6 +241,7 @@ public class GUIEmbargos extends JFrame {
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				embargoJudicial=(EmbargoJudicial) SimulacionCasos.generarEmbargoNormal();
+				embargoJudicial.setIdAutoridad(idAutoridad);
 				txtIdEmbargo.setText(embargoJudicial.getIdEmbargo());
 				txtIdAutoridad.setText(embargoJudicial.getIdAutoridad());
 				txtNumProceso.setText(embargoJudicial.getNumProceso());
@@ -383,6 +382,7 @@ public class GUIEmbargos extends JFrame {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				embargoCoactivo=(EmbargoCoactivo) SimulacionCasos.generarEmbargoDian();
+				embargoCoactivo.setIdAutoridad(idAutoridad);
 				txtIdEmbargoDian.setText(embargoCoactivo.getIdEmbargo());
 				txtIdAutoridadDian.setText(embargoCoactivo.getIdAutoridad());
 				txtNumProcesoDian.setText(embargoCoactivo.getNumProceso());				
@@ -426,65 +426,145 @@ public class GUIEmbargos extends JFrame {
 		tabbedPane.addTab("Consultas", null, pnlConsultas, null);
 		pnlConsultas.setLayout(null);
 
-		textField_10 = new JTextField();
-		textField_10.setBounds(160, 60, 143, 20);
-		pnlConsultas.add(textField_10);
-		textField_10.setColumns(10);
+		txtValueA = new JTextField();
+		txtValueA.setBounds(160, 60, 143, 20);
+		pnlConsultas.add(txtValueA);
+		txtValueA.setColumns(10);
 
-		textField_11 = new JTextField();
-		textField_11.setColumns(10);
-		textField_11.setBounds(160, 104, 143, 20);
-		pnlConsultas.add(textField_11);
+		txtValueB = new JTextField();
+		txtValueB.setColumns(10);
+		txtValueB.setBounds(160, 104, 143, 20);
+		pnlConsultas.add(txtValueB);
 
 		JScrollPane scrollPane_2 = new JScrollPane();
 		scrollPane_2.setBounds(21, 180, 577, 415);
 		pnlConsultas.add(scrollPane_2);
+		
+		JTextPane txtResultado = new JTextPane();
+		scrollPane_2.setViewportView(txtResultado);
 
-		textField_12 = new JTextField();
-		textField_12.setColumns(10);
-		textField_12.setBounds(160, 143, 143, 20);
-		pnlConsultas.add(textField_12);
+		txtValueC = new JTextField();
+		txtValueC.setColumns(10);
+		txtValueC.setBounds(160, 143, 143, 20);
+		pnlConsultas.add(txtValueC);
 
+		//"{\"selector\":{\"owner\":\"tom\"}}"
 		JButton btnConsutar = new JButton("Consutar");
-		btnConsutar.setBounds(99, 26, 89, 23);
+		btnConsutar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String selectors="";
+				if(!txtSelectorA.getText().isEmpty()) {
+					selectors="\""+txtSelectorA.getText()+"\""+":"+"\""+txtValueA.getText()+"\"";
+				}if(!txtSelectorB.getText().isEmpty()) {
+					selectors+=","+"\""+txtSelectorB.getText()+"\""+":"+"\""+txtValueB.getText()+"\"";
+				}if(!txtSelectorC.getText().isEmpty()) {
+					selectors+=","+"\""+txtSelectorC.getText()+"\""+":"+"\""+txtValueC.getText()+"\"";
+				}
+				String consulta="{\"selector\":{"+selectors+"}}";
+				String mensaje=EmbargosController.consultaGeneral(consulta);
+				txtResultado.setText(toPrettyFormat(mensaje));
+			}
+		});
+		btnConsutar.setBounds(99, 26, 119, 23);
 		pnlConsultas.add(btnConsutar);
 
-		textField_13 = new JTextField();
-		textField_13.setColumns(10);
-		textField_13.setBounds(10, 60, 143, 20);
-		pnlConsultas.add(textField_13);
+		txtSelectorA = new JTextField();
+		txtSelectorA.setColumns(10);
+		txtSelectorA.setBounds(10, 60, 143, 20);
+		pnlConsultas.add(txtSelectorA);
 
-		textField_14 = new JTextField();
-		textField_14.setColumns(10);
-		textField_14.setBounds(10, 104, 143, 20);
-		pnlConsultas.add(textField_14);
+		txtSelectorB = new JTextField();
+		txtSelectorB.setColumns(10);
+		txtSelectorB.setBounds(10, 104, 143, 20);
+		pnlConsultas.add(txtSelectorB);
 
-		textField_15 = new JTextField();
-		textField_15.setColumns(10);
-		textField_15.setBounds(10, 143, 143, 20);
-		pnlConsultas.add(textField_15);
+		txtSelectorC = new JTextField();
+		txtSelectorC.setColumns(10);
+		txtSelectorC.setBounds(10, 143, 143, 20);
+		pnlConsultas.add(txtSelectorC);
 
 		JButton btnConsultarEmbargo = new JButton("Consultar embargo id");
-		btnConsultarEmbargo.setBounds(388, 11, 152, 23);
+		btnConsultarEmbargo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String mensaje=EmbargosController.obtenerEmbargo(txtId.getText());
+				txtResultado.setText(toPrettyFormat(mensaje));				
+			}
+		});
+		btnConsultarEmbargo.setBounds(368, 11, 199, 23);
 		pnlConsultas.add(btnConsultarEmbargo);
 
 		JButton btnConsultarAutoridadId = new JButton("Consultar autoridad id");
-		btnConsultarAutoridadId.setBounds(388, 45, 152, 23);
+		btnConsultarAutoridadId.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String mensaje=EmbargosController.obtenerAutoridad(txtId.getText());
+				txtResultado.setText(toPrettyFormat(mensaje));
+			}
+		});
+		btnConsultarAutoridadId.setBounds(368, 45, 199, 23);
 		pnlConsultas.add(btnConsultarAutoridadId);
 
 		JButton btnConsultarPersonaId = new JButton("Consultar persona id");
-		btnConsultarPersonaId.setBounds(388, 79, 152, 23);
+		btnConsultarPersonaId.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String mensaje=EmbargosController.obtenerPersona(txtId.getText(), txtTipoId.getText());
+				txtResultado.setText(toPrettyFormat(mensaje));
+			}
+		});
+		btnConsultarPersonaId.setBounds(368, 79, 199, 23);
 		pnlConsultas.add(btnConsultarPersonaId);
 
-		textField_16 = new JTextField();
-		textField_16.setBounds(368, 112, 186, 20);
-		pnlConsultas.add(textField_16);
-		textField_16.setColumns(10);
+		txtId = new JTextField();
+		txtId.setBounds(368, 112, 199, 20);
+		pnlConsultas.add(txtId);
+		txtId.setColumns(10);
 
-		textField_17 = new JTextField();
-		textField_17.setColumns(10);
-		textField_17.setBounds(368, 143, 186, 20);
-		pnlConsultas.add(textField_17);
+		txtTipoId = new JTextField();
+		txtTipoId.setColumns(10);
+		txtTipoId.setBounds(368, 143, 199, 20);
+		pnlConsultas.add(txtTipoId);
+		
+		JPanel pnlEmbargos = new JPanel();
+		tabbedPane.addTab("Embargos", null, pnlEmbargos, null);
+		pnlEmbargos.setLayout(null);
+		
+		JButton btnEditar = new JButton("Editar");
+		btnEditar.setBounds(29, 495, 117, 25);
+		pnlEmbargos.add(btnEditar);
+		
+		JButton btnEliminar = new JButton("Eliminar");
+		btnEliminar.setBounds(176, 495, 117, 25);
+		pnlEmbargos.add(btnEliminar);
+		
+		JButton btnVerHistorial = new JButton("Ver Historial");
+		btnVerHistorial.setBounds(321, 495, 142, 25);
+		pnlEmbargos.add(btnVerHistorial);
+		
+		JButton btnEjecutar = new JButton("Ejecutar");
+		btnEjecutar.setBounds(489, 495, 117, 25);
+		pnlEmbargos.add(btnEjecutar);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(12, 12, 613, 471);
+		pnlEmbargos.add(scrollPane);
+		
+		JTextPane txtEmbargos = new JTextPane();
+		scrollPane.setViewportView(txtEmbargos);
+		
+		tabbedPane.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {				
+				if(tabbedPane.getSelectedIndex()==3){
+					String json=EmbargosController.obtenerAutoridad(idAutoridad);
+					Autoridad autoridad = gson.fromJson(json, Autoridad.class);
+					String[] embargosId=autoridad.getEmbargosRealizados();
+					String embargos="";
+					for (int i = 0; i < embargosId.length; i++) {
+						String json2=EmbargosController.obtenerEmbargo(embargosId[0]);
+						embargos+=toPrettyFormat(json2);
+					}
+					txtEmbargos.setText(embargos);
+				}
+			}
+		});
 	}
 	
 	public EmbargoJudicial getEmbargoJudicial() {
@@ -561,5 +641,15 @@ public class GUIEmbargos extends JFrame {
 		System.setOut(old);
 		return baos.toString();
 	}
+	
+	  public static String toPrettyFormat(String jsonString) 
+	  {
+	      JsonParser parser = new JsonParser();
+	      JsonObject json = parser.parse(jsonString).getAsJsonObject();
 
+	      Gson gson = new GsonBuilder().setPrettyPrinting().create();
+	      String prettyJson = gson.toJson(json);
+
+	      return prettyJson;
+	  }
 }

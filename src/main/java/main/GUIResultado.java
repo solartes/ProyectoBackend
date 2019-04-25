@@ -30,7 +30,7 @@ public class GUIResultado extends JFrame {
 	 */
 	public GUIResultado(String mensajePasarela,String mensaje, Embargo embargo) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 544, 429);
+		setBounds(100, 100, 544, 487);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -55,9 +55,10 @@ public class GUIResultado extends JFrame {
 				}
 				embargo.setEmbargoProcesado(true);
 				EmbargosController.guardarEmbargo(embargo);
+				dispose();
 			}
 		});
-		btnNewButton.setBounds(112, 356, 149, 23);
+		btnNewButton.setBounds(100, 409, 149, 23);
 		contentPane.add(btnNewButton);
 		
 		JButton btnNewButton_1 = new JButton("No aplicar medida");
@@ -71,10 +72,23 @@ public class GUIResultado extends JFrame {
 				}
 				embargo.setEmbargoProcesado(false);
 				EmbargosController.guardarEmbargo(embargo);
+				dispose();
 			}
 		});
-		btnNewButton_1.setBounds(327, 356, 149, 23);
+		btnNewButton_1.setBounds(308, 409, 149, 23);
 		contentPane.add(btnNewButton_1);
+		
+		JButton btnAplicarD = new JButton("Aplicar d1");
+		btnAplicarD.setBounds(68, 342, 117, 25);
+		contentPane.add(btnAplicarD);
+		
+		JButton btnAplicarD_1 = new JButton("Aplicar d2");
+		btnAplicarD_1.setBounds(219, 342, 117, 25);
+		contentPane.add(btnAplicarD_1);
+		
+		JButton btnAplicarD_2 = new JButton("Aplicar d3");
+		btnAplicarD_2.setBounds(369, 342, 117, 25);
+		contentPane.add(btnAplicarD_2);
 	}
 
 	

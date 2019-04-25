@@ -97,5 +97,13 @@ public class Embargo {
 		this.demandados = demandados;
 	}
 
+	@Override
+	public String toString() {
+		return "Embargo [idEmbargo=" + idEmbargo + ", numProceso=" + numProceso + ", tipoEmbargo=" + tipoEmbargo
+				+ ", numCuentaAgrario=" + numCuentaAgrario + ", ciudadCuentaAgrario=" + ciudadCuentaAgrario
+				+ ", departamentoCuentaAgrario=" + departamentoCuentaAgrario + ", embargoProcesado=" + embargoProcesado
+				+ "]";
+	}
+
 
 }
